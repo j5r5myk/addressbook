@@ -70,7 +70,9 @@ public class ContactForm extends FormLayout implements ClickListener {
     }
 
     void edit(Contact contact) {
-        this.contact = contact;
+        
+    	this.contact = null;
+    	this.contact = contact;
        
         if (contact != null) {
             // Bind the properties of the contact POJO to fiels in this form
@@ -89,7 +91,7 @@ public class ContactForm extends FormLayout implements ClickListener {
     @Override
     public void buttonClick(ClickEvent event) {
     	String msg = "saved";
-    	boolean update = false;
+    	String update = "insert";
     	
         if (event.getButton() == save) {
             try {
@@ -104,12 +106,30 @@ public class ContactForm extends FormLayout implements ClickListener {
             	
             	for (int i = 0; i < contacts.size(); i++){
             		if (contacts.get(i).getFirstName().equals(this.contact.getFirstName()) && 
-            				contacts.get(i).getLastName().equals(this.contact.getLastName() )){
+            				contacts.get(i).getLastName().equals(this.contact.getLastName()) &&  
+                    			(	! contacts.get(i).getPhone().equals(this.contact.getPhone()) || 
+                            				! contacts.get(i).getEmail().equals(this.contact.getEmail()) ||
+                                    			!	contacts.get(i).getBirthDate().equals(this.contact.getBirthDate()))){
             			
+            			System.out.println("contacts.get(i).getId()" + contacts.get(i).getId() );
             			this.contact.setId(contacts.get(i).getId());
-            			update = true;
-            			
+            			update = "update";
+            			System.out.println("Breaking");
             			break;
+            		}
+            		else if (contacts.get(i).getFirstName().equals(this.contact.getFirstName()) && 
+            				contacts.get(i).getLastName().equals(this.contact.getLastName()) && 
+            				 contacts.get(i).getPhone().equals(this.contact.getPhone())&& 
+                    				 contacts.get(i).getEmail().equals(this.contact.getEmail()) && 
+                            				contacts.get(i).getBirthDate().equals(this.contact.getBirthDate())){
+            			System.out.println("in update if");
+            			update = "duplicate";
+            			break;
+            		}
+            		else if (! contacts.get(i).getFirstName().equals(this.contact.getFirstName()) && 
+            				! contacts.get(i).getLastName().equals(this.contact.getLastName()) ){
+            			System.out.println("in insert if");
+            			update = "insert";
             		}
             	}
                 
@@ -137,6 +157,7 @@ public class ContactForm extends FormLayout implements ClickListener {
             getUI().contactList.select(null);
         }
 
+        getUI().contactList.select(null);
     }
 
 }

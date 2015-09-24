@@ -14,6 +14,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import com.mongodb.WriteResult;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -118,96 +119,73 @@ public class ContactService {
 
 	}
 
-	public int save(Contact contact, boolean update) {
+	public int save(Contact contact, String updateType) {
 
 		MongoCollection<Document> table = db.getCollection("contacts");
 		MongoCursor<Document> cursor = table.find().iterator();
 
 		Document current = null;
 		int status = 0;
-		while (cursor.hasNext() || table.count() == 0) {
+		
+		System.out.println("UPDATE TYPE " + updateType);
+		
+		if (updateType.equals("update")){
+			System.out.println("in update");
+			DB db = mongo.getDB("contactsdb");
+            DBCollection collection = db.getCollection("contacts");
+       
+            while (cursor.hasNext()){
+            	
+            	if (((Integer) current.get("contactid")).intValue() == contact
+                        .getId())
+            		break;
+            	current = cursor.next();
+            }
+            BasicDBObject query = new BasicDBObject();
+            query.append("contactid", current.get("contactid"));
+            query.append("firstName", current.get("firstName"));
+            query.append("lastName", current.get("lastName"));
+            query.append("phone", current.get("phone"));
+            
+            WriteResult wr =collection.remove(query);
+            
+            System.out.println(wr.toString());
 
-			if (table.count() != 0) {
-				current = cursor.next();
+            Document doc = new Document("contact", "details")
+                        .append("contactid", contact.getId())
+                        .append("firstName", contact.getFirstName())
+                        .append("lastName", contact.getLastName())
+                        .append("email", contact.getEmail())
+                        .append("bdate", contact.getBirthDate())
+                        .append("phone", contact.getPhone());
+           
+            table.insertOne(doc);
+            
+            status = 1;
+            cursor.close();
+		}
+		else if (updateType.equals("insert"))
+		{
+			System.out.println("in insert");
+			Document doc = new Document("contact", "details")
+            .append("contactid", contact.getId())
+            .append("firstName", contact.getFirstName())
+            .append("lastName", contact.getLastName())
+            .append("email", contact.getEmail())
+            .append("bdate", contact.getBirthDate())
+            .append("phone", contact.getPhone());
 
-				if (((Integer) current.get("contactid")).intValue() == contact
-						.getId() && update)
-
-				{
-
-					DB db = mongo.getDB("contactsdb");
-					DBCollection collection = db.getCollection("contacts");
-
-					BasicDBObject query = new BasicDBObject();
-					query.append("contactid", current.get("contactid"));
-					query.append("firstName", current.get("firstName"));
-					query.append("lastName", current.get("lastName"));
-					query.append("phone", current.get("phone"));
-
-					collection.remove(query);
-
-					Document doc = new Document("contact", "details")
-							.append("contactid", contact.getId())
-							.append("firstName", contact.getFirstName())
-							.append("lastName", contact.getLastName())
-							.append("email", contact.getEmail())
-							.append("bdate", contact.getBirthDate())
-							.append("phone", contact.getPhone());
-
-					table.insertOne(doc);
-					status = 1;
-					break;
-
-				}
-
-				else if (((Integer) current.get("contactid")).intValue() != contact
-						.getId()
-						&& current.get("firstName").equals(
-								contact.getFirstName())
-						&& current.get("lastName")
-								.equals(contact.getLastName())) {
-
-					status = 2;
-					break;
-				} else if (((Integer) current.get("contactid")).intValue() != contact
-						.getId()
-						&& !current.get("firstName").equals(
-								contact.getFirstName())
-						&& !current.get("lastName").equals(
-								contact.getLastName()) && !update) {
-
-					Document doc = new Document("contact", "details")
-							.append("contactid", contact.getId())
-							.append("firstName", contact.getFirstName())
-							.append("lastName", contact.getLastName())
-							.append("email", contact.getEmail())
-							.append("bdate", contact.getBirthDate())
-							.append("phone", contact.getPhone());
-
-					table.insertOne(doc);
-
-					status = 0;
-					break;
-
-				}
-			}
-
-			else {
-
-				Document doc = new Document("contact", "details")
-						.append("contactid", 0)
-						.append("firstName", contact.getFirstName())
-						.append("lastName", contact.getLastName())
-						.append("email", contact.getEmail())
-						.append("bdate", contact.getBirthDate())
-						.append("phone", contact.getPhone());
-
-				table.insertOne(doc);
-
-			}
+			table.insertOne(doc);
+			
+			status = 0;
 
 		}
-
+		else if (updateType.equals("duplicate")){
+			System.out.println("duplicate?");
+            System.out.println(((Integer) current.get("contactid")).intValue());
+            status = 2;
+            
+		}
 		return status;
 	}
 
