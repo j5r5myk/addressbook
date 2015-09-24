@@ -1,12 +1,13 @@
 package com.redhat.addressbook.backend;
 
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.bson.Document;
 
@@ -18,7 +19,7 @@ import com.mongodb.WriteResult;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.redhat.addressbook.backend.Contact;
+import com.mongodb.client.model.Filters.*;
 
 public class ContactService {
 
@@ -83,7 +84,7 @@ public class ContactService {
 
 				Contact c = null;
 
-				c = new Contact((String) document.get("firstName"),
+				c = new Contact((UUID)document.get("contactid"),(String) document.get("firstName"),
 						(String) document.get("lastName"),
 						(String) document.get("phone"),
 						(String) document.get("email"),
@@ -99,7 +100,7 @@ public class ContactService {
 
 				Contact c = null;
 
-				c = new Contact((String) document.get("firstName"),
+				c = new Contact((UUID)document.get("contactid"),(String) document.get("firstName"),
 						(String) document.get("lastName"),
 						(String) document.get("phone"),
 						(String) document.get("email"),
@@ -123,7 +124,6 @@ public class ContactService {
 
 		MongoCollection<Document> table = db.getCollection("contacts");
 		MongoCursor<Document> cursor = table.find().iterator();
-
 		Document current = null;
 		int status = 0;
 		
@@ -134,35 +134,60 @@ public class ContactService {
 			DB db = mongo.getDB("contactsdb");
             DBCollection collection = db.getCollection("contacts");
        
-            while (cursor.hasNext()){
-            	
-            	if (((Integer) current.get("contactid")).intValue() == contact
-                        .getId())
-            		break;
-            	current = cursor.next();
-            }
-            BasicDBObject query = new BasicDBObject();
-            query.append("contactid", current.get("contactid"));
-            query.append("firstName", current.get("firstName"));
-            query.append("lastName", current.get("lastName"));
-            query.append("phone", current.get("phone"));
+//            while (cursor.hasNext()){
+//            	
+//            	if (((Integer) current.get("contactid")).intValue() == contact
+//                        .getId())
+//            		break;
+//            	current = cursor.next();
+//            }
+//            BasicDBObject query = new BasicDBObject();
+//            query.append("contactid", current.get("contactid"));
+//            query.append("firstName", current.get("firstName"));
+//            query.append("lastName", current.get("lastName"));
+//            query.append("phone", current.get("phone"));
+//            
+//            WriteResult wr =collection.remove(query);
+//            
+//            System.out.println(wr.toString());
+//
+//            Document doc = new Document("contact", "details")
+//                        .append("contactid", contact.getId())
+//                        .append("firstName", contact.getFirstName())
+//                        .append("lastName", contact.getLastName())
+//                        .append("email", contact.getEmail())
+//                        .append("bdate", contact.getBirthDate())
+//                        .append("phone", contact.getPhone());
+           
+            //table.insertOne(doc);
             
-            WriteResult wr =collection.remove(query);
-            
-            System.out.println(wr.toString());
+//JASON            
+//            table.updateOne(eq("contactid",contact.getId()), new Document ("$set", new Document("contact", "details")
+//                        .append("contactid", contact.getId())
+//                        .append("firstName", contact.getFirstName())
+//                        .append("lastName", contact.getLastName())
+//                        .append("email", contact.getEmail())
+//                        .append("bdate", contact.getBirthDate())
+//                        .append("phone", contact.getPhone())));
 
-            Document doc = new Document("contact", "details")
-                        .append("contactid", contact.getId())
-                        .append("firstName", contact.getFirstName())
-                        .append("lastName", contact.getLastName())
+            
+            
+            
+          BasicDBObject carrier = new BasicDBObject();
+          BasicDBObject query = new BasicDBObject();
+          query.put("contactid", contact.getId());
+          
+          BasicDBObject set  = new BasicDBObject("$set", carrier);
+          carrier.put("contactid", contact.getId());
+          carrier.append("firstName", contact.getFirstName())
+          .append("lastName", contact.getLastName())
                         .append("email", contact.getEmail())
                         .append("bdate", contact.getBirthDate())
                         .append("phone", contact.getPhone());
-           
-            table.insertOne(doc);
-            
-            status = 1;
-            cursor.close();
+          
+          collection.update(query, set);
+          
+          status = 1;
 		}
 		else if (updateType.equals("insert"))
 		{
@@ -182,10 +207,12 @@ public class ContactService {
 		}
 		else if (updateType.equals("duplicate")){
 			System.out.println("duplicate?");
-            System.out.println(((Integer) current.get("contactid")).intValue());
+           // System.out.println(((Integer) current.get("contactid")).intValue());
             status = 2;
             
 		}
+		
+		cursor.close();
 		return status;
 	}
 
