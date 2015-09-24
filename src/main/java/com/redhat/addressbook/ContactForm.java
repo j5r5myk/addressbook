@@ -112,23 +112,23 @@ public class ContactForm extends FormLayout implements ClickListener {
                             				! contacts.get(i).getEmail().equals(this.contact.getEmail()) ||
                                     			!	contacts.get(i).getBirthDate().equals(this.contact.getBirthDate()))){
             			
-            			System.out.println("contacts.get(i).getId()" + contacts.get(i).getId() + "i=" + i);
+            			
             			this.contact.setId(contacts.get(i).getId());
             			update = "update";
-            			System.out.println("Breaking");
+            			
             			break;
             		}
             		else if (contacts.get(i).getFirstName().equals(this.contact.getFirstName()) && 
             				contacts.get(i).getLastName().equals(this.contact.getLastName()) && 
             				 contacts.get(i).getPhone().equals(this.contact.getPhone())&& 
                     				 contacts.get(i).getEmail().equals(this.contact.getEmail())){
-            			System.out.println("in duplicate if");
+            			
             			update = "duplicate";
             			break;
             		}
             		else if (! contacts.get(i).getFirstName().equals(this.contact.getFirstName()) && 
             				! contacts.get(i).getLastName().equals(this.contact.getLastName()) ){
-            			System.out.println("in insert if");
+            			
             			update = "insert";
             		}
             	}
@@ -137,8 +137,7 @@ public class ContactForm extends FormLayout implements ClickListener {
                 // Save DAO to backend with direct synchronous service API
                
                 int status = getUI().service.save(this.contact, update);
-                System.out.println("Saving this contact: " +this.contact);
-
+               
                 if (status == 1 || status == 0){
                 msg = String.format("Saved '%s %s'.",
                         contact.getFirstName(), contact.getLastName());

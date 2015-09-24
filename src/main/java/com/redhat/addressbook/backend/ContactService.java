@@ -45,7 +45,7 @@ public class ContactService {
 			if (is != null){
 				try {
 					prop.load(is);
-					System.out.println("IS NOT NULL");
+					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -127,52 +127,14 @@ public class ContactService {
 		Document current = null;
 		int status = 0;
 		
-		System.out.println("UPDATE TYPE " + updateType);
+		
 		
 		if (updateType.equals("update")){
-			System.out.println("in update");
+		
 			DB db = mongo.getDB("contactsdb");
             DBCollection collection = db.getCollection("contacts");
        
-//            while (cursor.hasNext()){
-//            	
-//            	if (((Integer) current.get("contactid")).intValue() == contact
-//                        .getId())
-//            		break;
-//            	current = cursor.next();
-//            }
-//            BasicDBObject query = new BasicDBObject();
-//            query.append("contactid", current.get("contactid"));
-//            query.append("firstName", current.get("firstName"));
-//            query.append("lastName", current.get("lastName"));
-//            query.append("phone", current.get("phone"));
-//            
-//            WriteResult wr =collection.remove(query);
-//            
-//            System.out.println(wr.toString());
-//
-//            Document doc = new Document("contact", "details")
-//                        .append("contactid", contact.getId())
-//                        .append("firstName", contact.getFirstName())
-//                        .append("lastName", contact.getLastName())
-//                        .append("email", contact.getEmail())
-//                        .append("bdate", contact.getBirthDate())
-//                        .append("phone", contact.getPhone());
-           
-            //table.insertOne(doc);
-            
-//JASON            
-//            table.updateOne(eq("contactid",contact.getId()), new Document ("$set", new Document("contact", "details")
-//                        .append("contactid", contact.getId())
-//                        .append("firstName", contact.getFirstName())
-//                        .append("lastName", contact.getLastName())
-//                        .append("email", contact.getEmail())
-//                        .append("bdate", contact.getBirthDate())
-//                        .append("phone", contact.getPhone())));
 
-            
-            
-            
           BasicDBObject carrier = new BasicDBObject();
           BasicDBObject query = new BasicDBObject();
           query.put("contactid", contact.getId());
@@ -191,7 +153,7 @@ public class ContactService {
 		}
 		else if (updateType.equals("insert"))
 		{
-			System.out.println("in insert");
+			
 			Document doc = new Document("contact", "details")
             .append("contactid", contact.getId())
             .append("firstName", contact.getFirstName())
@@ -206,9 +168,7 @@ public class ContactService {
 
 		}
 		else if (updateType.equals("duplicate")){
-			System.out.println("duplicate?");
-           // System.out.println(((Integer) current.get("contactid")).intValue());
-            status = 2;
+		    status = 2;
             
 		}
 		
