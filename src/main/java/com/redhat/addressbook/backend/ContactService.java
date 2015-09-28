@@ -15,11 +15,12 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import com.mongodb.WriteResult;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters.*;
+
 
 public class ContactService {
 
@@ -31,6 +32,9 @@ public class ContactService {
 	private static   InputStream is;
 	private static String dbUrl = null;
 	private static int dbPort = 0;
+	private static String username = "";
+	private static String password = "";
+	private static String database = "contactsdb";
 	
 	public static ContactService createDemoService() {
 
@@ -52,11 +56,29 @@ public class ContactService {
 				}
 				dbUrl = prop.getProperty("mongodb.url");
 				dbPort = Integer.parseInt(prop.getProperty("mongodb.port"));
-				
+				username = prop.getProperty("mongodb.username");
+				password = prop.getProperty("mongodb.password");
+				database = prop.getProperty("mongodb.database");
 			}
 			
+			System.out.println("url " + dbUrl + " port " + dbPort + " username " + username + " password " + " database " + database);
+			
 			mongo = new MongoClient(dbUrl, dbPort);
-			db = mongo.getDatabase("contactsdb");
+//			List<ServerAddress> seeds = new ArrayList<ServerAddress>();
+//			seeds.add( new ServerAddress( dbUrl, dbPort ));
+//			
+//			List <MongoCredential> credentials = new ArrayList<MongoCredential>();
+//			credentials.add(
+//				    MongoCredential.createMongoCRCredential(
+//				        username,
+//				        database,
+//				        password.toCharArray()
+//				    )
+//				);
+//			
+			//mongo = new MongoClient(seeds, credentials);
+			
+			db = mongo.getDatabase(database);
 			if (db.getCollection("contacts") == null)
 
 				db.createCollection("contacts");
