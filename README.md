@@ -1,6 +1,7 @@
 Addressbook
 ====================
 
+
 This address book is a Java EE 7 webapp based on the vaadin framework that allows contacts to be added to a webform. The goal behind writing this application was to demonstrate a proof of concept of an EE 7 application getting deployed to OSE 2.2 via a CI/CD pipeline using a JBoss EAP 6.1.1 cartridge but also a custom Mongo V3 cartridge. This app can also run on a plain old Jboss EAP 6.4 container with a standalone Mongo V3 database. This application does not use any persistence frameworks. 
 
 
